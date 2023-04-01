@@ -27,6 +27,7 @@ def test(n, fr=0, sfr=0):
 
 test(0, 1, 1)
 test(1, 1, 1)
+test(1, 1, 1)
 test(2, 2, 2)
 test(3, 6, 12)
 test(4, 24, 288)
