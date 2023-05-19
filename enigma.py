@@ -4,12 +4,12 @@ def rotor(symbol, n, reverse=False):
     r2 = 'A  J  D  K  S  I  R  U  X  B  L  H  W  T  M  C  Q  G  Z  N  P  Y  F  V  O  E'.replace('  ', '')
     r3 = 'B  D  F  H  J  L  C  P  R  T  X  V  Z  N  Y  E  I  W  G  A  K  M  U  S  Q  O'.replace('  ', '')
 
-    # ротор(диск) с перемешенным алфовитом, где r0 - упорядоченный алфовит, а
+    # ротор(номер_диска) с перемешенным алфовитом, где r0 - упорядоченный алфовит, а
     # r(N) - перемешенный алфовит
-    lst = [r0, r1, r2, r3]
+    rotors = [r0, r1, r2, r3]
 
-    # вернуть символ rn диска по порядковому номеру этого же символа в диске который передается
-    return lst[n][r0.index(symbol)] if not reverse else lst[0][lst[n].index(symbol)]
+    # вернуть символ r(N) диска по порядковому номеру этого же символа в диске который передается
+    return rotors[n][r0.index(symbol)] if not reverse else rotors[0][rotors[n].index(symbol)]
 
 
 def reflector(symbol, n):
@@ -23,12 +23,12 @@ def reflector(symbol, n):
     # вернуть отраженный символ
     return REFLECTORS[n][REFLECTORS[0].index(symbol)]
 
-
+# шифр Цезаря и ничего необычного
 def caesar(text, key, alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
     # здесь будет результат кодировки
-    text1 = ''
+    caesar_text = ''
 
-    # кол-во смещений позиций в алфавите
+    # на сколько смещать букву в алфавите
     key0 = key
 
     # если ключ больше длины алфавита, то оставить его остаток
@@ -36,23 +36,23 @@ def caesar(text, key, alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
         key0 = key % len(alphabet)
 
     # проходимся по тексту, который нужно зашифровать
-    for i in text:
-        if i.upper() in alphabet:
+    for alph in text:
+        if alph.upper() in alphabet:
 
             # если полученный индекс выйдет больше длины алфавита, то отнять его длину
-            if (alphabet.index(i.upper()) + key0) > (len(alphabet) - 1):
-                text1 += alphabet[alphabet.index(i.upper()) + key0 - len(alphabet)]
+            if (alphabet.index(alph.upper()) + key0) > (len(alphabet) - 1):
+                caesar_text += alphabet[alphabet.index(alph.upper()) + key0 - len(alphabet)]
 
             # если полученный индекс наоборот отрицательный, то прибавить длину алфавита
-            elif (alphabet.index(i.upper()) + key0) < 0:
-                text1 += alphabet[alphabet.index(i.upper()) + key0 + len(alphabet)]
+            elif (alphabet.index(alph.upper()) + key0) < 0:
+                caesar_text += alphabet[alphabet.index(alph.upper()) + key0 + len(alphabet)]
 
             # если индекс в пределах нормы - просто извлечь символ из алфавита со смещением
             else:
-                text1 += alphabet[alphabet.index(i.upper()) + key0]
+                caesar_text += alphabet[alphabet.index(alph.upper()) + key0]
 
     # выводим результат
-    return text1
+    return caesar_text
 
 
 # при этих смещениях происходит *магия*
@@ -84,7 +84,7 @@ def enigma(text, ref, rot1, shift1, rot2, shift2, rot3, shift3, pairs=""):
     if len(pairs) % 2 != 0: return 'Извините, невозможно произвести коммутацию'
 
     # здесь будет результат
-    text2 = ''
+    enigma_text_res = ''
 
     # делаем текст валидным, избавляемся от пробелов и прочего
     text = [sym_corr.upper() for sym_corr in text if sym_corr.upper() in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ']
@@ -126,9 +126,11 @@ def enigma(text, ref, rot1, shift1, rot2, shift2, rot3, shift3, pairs=""):
         sym_edit = caesar(sym_edit, 0 - shift3)
         sym_edit = commut(sym_edit, pairs)
 
-        text2 += sym_edit
-
-    return text2
+        enigma_text_res += sym_edit
 
 
-enigma('IOKVGTPXYQ', 1, 1, 0, 2, 0, 3, 0, 'AC')
+    return enigma_text_res
+
+
+print(enigma('RRBWELXP', 1, 1, 0, 2, 0, 3, 0, 'AC'))
+
