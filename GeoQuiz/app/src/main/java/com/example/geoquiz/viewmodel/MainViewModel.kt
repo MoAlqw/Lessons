@@ -17,6 +17,8 @@ class MainViewModel: ViewModel() {
     private var data: List<Question> = emptyList()
     private val userAnswers = mutableMapOf<Int, Int?>()
 
+    private val _currentStateButton = MutableLiveData<Boolean>()
+    val currentStateButton: LiveData<Boolean> get() = _currentStateButton
     private val _currentQuestion = MutableLiveData<String>()
     val currentQuestion: LiveData<String> get() = _currentQuestion
 
@@ -29,6 +31,7 @@ class MainViewModel: ViewModel() {
 
             userAnswers.putAll(data.indices.associateWith { null })
             _currentQuestion.value = data.firstOrNull()?.question ?: "No questions.."
+            _currentStateButton.value = true
         }
     }
 
@@ -40,13 +43,10 @@ class MainViewModel: ViewModel() {
         }
     }
 
-    fun enableButton(): Boolean {
-        return userAnswers[index] == null
-    }
-
     fun checkAnswer(answer: Boolean): Boolean {
         val result = data.getOrNull(index)?.answer == answer
         userAnswers[index] = if (result) 1 else 0
+        _currentStateButton.value = false
         return result
     }
 
@@ -57,6 +57,7 @@ class MainViewModel: ViewModel() {
                 Buttons.PAST -> (index-1+data.size) % data.size
             }
             _currentQuestion.value = data[index].question
+            _currentStateButton.value = userAnswers[index] == null
         }
     }
 }

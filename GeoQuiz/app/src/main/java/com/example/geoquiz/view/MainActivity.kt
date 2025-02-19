@@ -30,6 +30,11 @@ class MainActivity : AppCompatActivity() {
         btnPastQuestion = binding.btnPastQuestion
         btnNextQuestion = binding.btnNextQuestion
 
+        viewModel.currentStateButton.observe(this) {
+            btnFalse.isEnabled = it
+            btnTrue.isEnabled = it
+        }
+
         viewModel.currentQuestion.observe(this) {
             binding.tvQuestion.text = it
         }
@@ -52,8 +57,6 @@ class MainActivity : AppCompatActivity() {
             switchQuestion(Buttons.NEXT)
         }
 
-        updateUI()
-
     }
 
     private fun showResult() {
@@ -63,22 +66,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUI() {
-        val enableOrDisable = viewModel.enableButton()
-        btnFalse.isEnabled = enableOrDisable
-        btnTrue.isEnabled = enableOrDisable
-    }
-
     private fun switchQuestion(button: Buttons) {
         viewModel.buttonQuestion(button)
-        updateUI()
     }
 
     private fun showAnswerResult(btnValue: Boolean) {
         val isCorrect = viewModel.checkAnswer(btnValue)
         val message = if (isCorrect) R.string.correct else R.string.incorrect
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        updateUI()
     }
 
 }
