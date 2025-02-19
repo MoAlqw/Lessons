@@ -1,9 +1,0 @@
-<resources>
-    <string name="app_name">GeoQuiz</string>
-    <string name="true_string">True</string>
-    <string name="false_string">False</string>
-    <string name="correct">Correct!</string>
-    <string name="incorrect">Incorrect!</string>
-    <string name="next_question">next question</string>
-    <string name="past_question">past question</string>
-</resources>
