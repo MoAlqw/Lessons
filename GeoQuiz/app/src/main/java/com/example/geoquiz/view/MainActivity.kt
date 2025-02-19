@@ -30,6 +30,10 @@ class MainActivity : AppCompatActivity() {
         btnPastQuestion = binding.btnPastQuestion
         btnNextQuestion = binding.btnNextQuestion
 
+        viewModel.isGameOver.observe(this) {
+            if (it) showResult()
+        }
+
         viewModel.currentStateButton.observe(this) {
             btnFalse.isEnabled = it
             btnTrue.isEnabled = it
@@ -39,31 +43,16 @@ class MainActivity : AppCompatActivity() {
             binding.tvQuestion.text = it
         }
 
-        btnFalse.setOnClickListener {
-            showAnswerResult(false)
-            showResult()
-        }
-
-        btnTrue.setOnClickListener {
-            showAnswerResult(true)
-            showResult()
-        }
-
-        btnPastQuestion.setOnClickListener {
-            switchQuestion(Buttons.PAST)
-        }
-
-        btnNextQuestion.setOnClickListener {
-            switchQuestion(Buttons.NEXT)
-        }
+        btnFalse.setOnClickListener { showAnswerResult(false) }
+        btnTrue.setOnClickListener { showAnswerResult(true) }
+        btnPastQuestion.setOnClickListener { switchQuestion(Buttons.PAST) }
+        btnNextQuestion.setOnClickListener { switchQuestion(Buttons.NEXT) }
 
     }
 
     private fun showResult() {
         val result = viewModel.gameOver()
-        if (result >= 0) {
-            Toast.makeText(this, "Your result is $result/3", Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, "Your result is $result/3", Toast.LENGTH_SHORT).show()
     }
 
     private fun switchQuestion(button: Buttons) {
@@ -74,6 +63,9 @@ class MainActivity : AppCompatActivity() {
         val isCorrect = viewModel.checkAnswer(btnValue)
         val message = if (isCorrect) R.string.correct else R.string.incorrect
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+        // Check Game Over
+        viewModel.checkGameOver()
     }
 
 }
