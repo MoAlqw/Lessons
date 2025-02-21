@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_question"
@@ -12,47 +12,53 @@
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:textSize="24sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="Where is USA?"
-        android:textAlignment="center"
-        android:layout_gravity="center_horizontal" />
+        android:textAlignment="center" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btn_true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="5dp"
-        android:layout_margin="10dp"
-        tools:ignore="ButtonStyle, ContentDescription">
+        android:layout_marginTop="30dp"
+        android:text="@string/true_string"
+        app:layout_constraintTop_toBottomOf="@id/tv_question"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_false"/>
 
-        <ImageButton
-            android:id="@+id/btn_past_question"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:contentDescription="@string/past_question"
-            android:src="@drawable/baseline_arrow_back_24" />
+    <Button
+        android:id="@+id/btn_false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/false_string"
+        app:layout_constraintTop_toBottomOf="@id/tv_question"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_true"/>
 
-        <Button
-            android:id="@+id/btn_true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/true_string"
-            android:layout_margin="2dp"/>
+    <ImageButton
+        android:id="@+id/btn_past_question"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@id/btn_true"
+        app:layout_constraintEnd_toEndOf="@id/btn_true"
+        app:layout_constraintTop_toBottomOf="@id/btn_true"
+        android:contentDescription="@string/past_question"
+        android:src="@drawable/baseline_arrow_back_24" />
 
-        <Button
-            android:id="@+id/btn_false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/false_string"
-            android:layout_margin="2dp"/>
+    <ImageButton
+        android:id="@+id/btn_next_question"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@id/btn_false"
+        app:layout_constraintEnd_toEndOf="@id/btn_false"
+        app:layout_constraintTop_toBottomOf="@id/btn_false"
+        android:contentDescription="@string/next_question"
+        android:src="@drawable/baseline_arrow_forward_24" />
 
-        <ImageButton
-            android:id="@+id/btn_next_question"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:contentDescription="@string/incorrect"
-            android:src="@drawable/baseline_arrow_forward_24" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
