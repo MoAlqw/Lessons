@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showResult() {
         val result = viewModel.gameOver()
-        Toast.makeText(this, "Your result is $result/3", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
     }
 
     private fun switchQuestion(button: Buttons) {
