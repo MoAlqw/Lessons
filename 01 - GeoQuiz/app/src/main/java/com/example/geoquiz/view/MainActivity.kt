@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.geoquiz.Buttons
 import com.example.geoquiz.R
+import com.example.geoquiz.contracts.AnswerResultContract
 import com.example.geoquiz.databinding.ActivityMainBinding
 import com.example.geoquiz.viewmodel.MainViewModel
 
@@ -18,17 +19,22 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnTrue: Button
     private lateinit var btnPastQuestion: ImageButton
     private lateinit var btnNextQuestion: ImageButton
+    private lateinit var btnCheat: Button
     private val viewModel: MainViewModel by viewModels()
+
+    private val startForResult = registerForActivityResult(AnswerResultContract()) {
+        viewModel.updateCheatVariable(it)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
 
         btnFalse = binding.btnFalse
         btnTrue = binding.btnTrue
         btnPastQuestion = binding.btnPastQuestion
         btnNextQuestion = binding.btnNextQuestion
+        btnCheat = binding.btnCheat
 
         viewModel.isGameOver.observe(this) {
             if (it) showResult()
@@ -47,12 +53,17 @@ class MainActivity : AppCompatActivity() {
         btnTrue.setOnClickListener { showAnswerResult(true) }
         btnPastQuestion.setOnClickListener { switchQuestion(Buttons.PAST) }
         btnNextQuestion.setOnClickListener { switchQuestion(Buttons.NEXT) }
+        btnCheat.setOnClickListener { startAnswerActivity() }
+    }
 
+    private fun startAnswerActivity() {
+        if (!viewModel.dataIsEmpty) startForResult.launch(viewModel.getAnswerCurrentQuestion)
+        else Toast.makeText(this, R.string.data_are_not_loaded, Toast.LENGTH_SHORT).show()
     }
 
     private fun showResult() {
         val result = viewModel.gameOver()
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@MainActivity, result, Toast.LENGTH_SHORT).show()
     }
 
     private fun switchQuestion(button: Buttons) {
@@ -60,9 +71,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showAnswerResult(btnValue: Boolean) {
-        val isCorrect = viewModel.checkAnswer(btnValue)
-        val message = if (isCorrect) R.string.correct else R.string.incorrect
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        val message = viewModel.checkAnswer(btnValue)
+        Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
 
         // Check Game Over
         viewModel.checkGameOver()

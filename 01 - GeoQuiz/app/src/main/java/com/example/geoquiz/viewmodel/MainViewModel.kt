@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.geoquiz.Buttons
+import com.example.geoquiz.R
+import com.example.geoquiz.model.AnswerState
 import com.example.geoquiz.model.Question
 import com.example.geoquiz.model.QuestionsLoader
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +17,9 @@ class MainViewModel: ViewModel() {
 
     private var index = 0
     private var data: List<Question> = emptyList()
-    private val userAnswers = mutableMapOf<Int, Int?>()
+    private val userAnswers = mutableMapOf<Int, AnswerState>()
+    val getAnswerCurrentQuestion get() = data[index].answer
+    val dataIsEmpty get() = data.isEmpty()
 
     private val _isGameOver = MutableLiveData(false)
     val isGameOver: LiveData<Boolean> get() = _isGameOver
@@ -30,37 +34,46 @@ class MainViewModel: ViewModel() {
         // Maybe it would have been worth using a repository here
         viewModelScope.launch {
             _currentQuestion.value = "Loading questions.."
-            val loadedData = withContext(Dispatchers.IO) {
-                QuestionsLoader.load()
-            }
+            val loadedData = withContext(Dispatchers.IO) { QuestionsLoader.load() }
 
             data = loadedData
 
-            userAnswers.putAll(data.indices.associateWith { null })
+            userAnswers.putAll(data.indices.associateWith { AnswerState(null, false) })
             _currentQuestion.value = data.firstOrNull()?.question ?: "No questions.."
             _currentStateButton.value = true
         }
     }
 
+    fun updateCheatVariable(wasCheat: Boolean) {
+        userAnswers[index]?.wasCheated = wasCheat
+    }
+
     fun checkGameOver() {
-        if (userAnswers.values.all { it != null } && data.isNotEmpty()) _isGameOver.value = true
+        if (userAnswers.values.all { it.isCorrect != null } && data.isNotEmpty()) _isGameOver.value = true
     }
 
     fun gameOver(): String {
-        val correctAnswers = userAnswers.values.sumOf { it ?: 0 }
+        val correctAnswers = userAnswers.values.count { it.isCorrect == 1 }
         return "Your result is $correctAnswers/${data.size}"
     }
 
-    fun checkAnswer(answer: Boolean): Boolean {
+    fun checkAnswer(answer: Boolean): Int {
         if (data.isNotEmpty()) {
-            val result = data.getOrNull(index)?.answer == answer
-            userAnswers[index] = if (result) 1 else 0
+            val result = data.getOrNull(index)?.answer == answer && !userAnswers[index]!!.wasCheated
+            userAnswers[index]?.isCorrect = if (result) 1 else 0
+
+            val message = if (result) {
+                R.string.correct
+            } else if (userAnswers[index]!!.wasCheated) {
+                R.string.judgment_toast
+            } else R.string.incorrect
+
             // Update buttons
             _currentStateButton.value = false
 
-            return result
+            return message
         }
-        return false
+        return R.string.data_empty
     }
 
     fun buttonQuestion(nameButton: Buttons) {
@@ -73,7 +86,8 @@ class MainViewModel: ViewModel() {
             _currentQuestion.value = data[index].question
 
             // Update buttons
-            _currentStateButton.value = userAnswers[index] == null
+            _currentStateButton.value = userAnswers[index]!!.isCorrect == null
         }
     }
+
 }
