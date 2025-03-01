@@ -45,7 +45,7 @@ class MainViewModel: ViewModel() {
     }
 
     fun updateCheatVariable(wasCheat: Boolean) {
-        userAnswers[index]?.wasCheated = wasCheat
+        if (userAnswers[index]?.wasCheated == false) userAnswers[index]?.wasCheated = wasCheat
     }
 
     fun checkGameOver() {
