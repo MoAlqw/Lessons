@@ -7,7 +7,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.a01_criminalintent.R
 import com.example.a01_criminalintent.databinding.ActivityMainBinding
-import com.example.a01_criminalintent.view.fragment.CrimeFragment
 import com.example.a01_criminalintent.view.fragment.CrimeListFragment
 
 class MainActivity : AppCompatActivity() {
