@@ -44,7 +44,10 @@ class CrimeFragment: Fragment() {
         viewModel.currentCrime.observe(viewLifecycleOwner) {
             if (it.title != titleField.text.toString()) titleField.setText(it.title)
             dateButton.text = it.date.toString()
-            solvedCheckBox.isChecked = it.isSolved
+            solvedCheckBox.apply {
+                isChecked = it.isSolved
+                jumpDrawablesToCurrentState()
+            }
         }
     }
 
@@ -64,13 +67,17 @@ class CrimeFragment: Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.saveCrime()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
-
         const val ARG_CRIME_ID = "crime_id"
 
         fun newInstance(crimeId: UUID): CrimeFragment {

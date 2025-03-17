@@ -34,6 +34,13 @@ class CrimeFragmentViewModel(private val state: SavedStateHandle): ViewModel() {
         _currentCrime.value = update(crime)
     }
 
+    fun saveCrime() {
+        viewModelScope.launch {
+            val crime = _currentCrime.value ?: return@launch
+            crimeRepository.updateCrime(crime)
+        }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

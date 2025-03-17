@@ -5,6 +5,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.commit
 import com.example.a01_criminalintent.R
 import com.example.a01_criminalintent.databinding.ActivityMainBinding
 import com.example.a01_criminalintent.model.callback.Callbacks
@@ -29,20 +30,17 @@ class MainActivity : AppCompatActivity(), Callbacks {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
         if (currentFragment == null) {
             val crimeListFragment = CrimeListFragment.newInstance()
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragment_container, crimeListFragment)
-                .commit()
+            supportFragmentManager.commit {
+                add(R.id.fragment_container, crimeListFragment)
+            }
         }
-
     }
 
     override fun onCrimeSelected(crimeId: UUID) {
         val fragment = CrimeFragment.newInstance(crimeId)
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+        supportFragmentManager.commit {
+            replace(R.id.fragment_container, fragment)
+            addToBackStack(null)
+        }
     }
 }
