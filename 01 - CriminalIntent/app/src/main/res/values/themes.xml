@@ -1,6 +1,6 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme._01CriminalIntent" parent="Theme.Material3.DayNight">
+    <style name="Base.Theme._01CriminalIntent" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>

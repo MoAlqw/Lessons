@@ -8,12 +8,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.commit
 import com.example.a01_criminalintent.R
 import com.example.a01_criminalintent.databinding.ActivityMainBinding
-import com.example.a01_criminalintent.model.callback.Callbacks
 import com.example.a01_criminalintent.view.fragment.CrimeFragment
 import com.example.a01_criminalintent.view.fragment.CrimeListFragment
 import java.util.UUID
 
-class MainActivity : AppCompatActivity(), Callbacks {
+class MainActivity : AppCompatActivity(), CrimeListFragment.Callbacks {
 
     private lateinit var binding: ActivityMainBinding
 

@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.a01_criminalintent.R
-import com.example.a01_criminalintent.model.callback.Callbacks
 import com.example.a01_criminalintent.model.room.Crime
+import com.example.a01_criminalintent.view.fragment.CrimeListFragment
 import java.text.DateFormat
 
-class AdapterCrimeList(private val callback: Callbacks?):
+class AdapterCrimeList(private val callback: CrimeListFragment.Callbacks?):
     ListAdapter<Crime, AdapterCrimeList.CrimeHolder>(CrimeDiffUtilCallBack())
 {
     class CrimeDiffUtilCallBack: DiffUtil.ItemCallback<Crime>() {
@@ -22,7 +22,7 @@ class AdapterCrimeList(private val callback: Callbacks?):
         override fun areContentsTheSame(oldItem: Crime, newItem: Crime) = oldItem == newItem
     }
 
-    class CrimeHolder(itemView: View, private val callback: Callbacks?) : ViewHolder(itemView), View.OnClickListener {
+    class CrimeHolder(itemView: View, private val callback: CrimeListFragment.Callbacks?) : ViewHolder(itemView), View.OnClickListener {
         private val crimeTitle: TextView = itemView.findViewById(R.id.tv_crime_title)
         private val crimeData: TextView = itemView.findViewById(R.id.tv_crime_date)
         private val imgSolved: ImageView = itemView.findViewById(R.id.img_solved)
