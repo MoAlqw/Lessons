@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.a01_criminalintent.databinding.FragmentCrimeBinding
@@ -25,6 +27,8 @@ class CrimeFragment: Fragment() {
 
     private var _binding: FragmentCrimeBinding? = null
     private val binding get() = _binding!!
+    private lateinit var crimeContainer: LinearLayout
+    private lateinit var progressBar: ProgressBar
     private lateinit var titleField: EditText
     private lateinit var dateButton: Button
     private lateinit var timeButton: Button
@@ -39,6 +43,8 @@ class CrimeFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCrimeBinding.inflate(inflater, container, false)
+        crimeContainer = binding.crimeContainer
+        progressBar = binding.progressBar
         titleField = binding.crimeTitle
         dateButton = binding.crimeDate
         solvedCheckBox = binding.crimeSolved
@@ -60,6 +66,14 @@ class CrimeFragment: Fragment() {
             }
         }
 
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            if (it == false) {
+                crimeContainer.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
+            }
+        }
+
+        @Suppress("DEPRECATION")
         parentFragmentManager.setFragmentResultListener(DatePickerFragment.REQUEST_KEY_DATE, viewLifecycleOwner) { _, bundle ->
             val result: Date = if (android.os.Build.VERSION.SDK_INT >= 33) {
                 bundle.getSerializable(DatePickerFragment.KEY_SELECTED_DATE, Date::class.java)

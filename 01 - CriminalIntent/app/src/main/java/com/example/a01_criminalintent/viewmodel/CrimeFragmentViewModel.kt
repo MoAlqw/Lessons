@@ -21,11 +21,15 @@ class CrimeFragmentViewModel(private val state: SavedStateHandle): ViewModel() {
     private val _currentCrime = MutableLiveData<Crime>()
     val currentCrime: LiveData<Crime> get() = _currentCrime
 
+    private val _isLoading = MutableLiveData<Boolean>(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     init {
         viewModelScope.launch {
             val crimeId: UUID = state[CrimeFragment.ARG_CRIME_ID] ?: throw IllegalArgumentException("crimeId is missing")
             val crime = crimeRepository.getCrime(crimeId) ?: Crime()
             _currentCrime.postValue(crime)
+            _isLoading.postValue(false)
         }
     }
 
