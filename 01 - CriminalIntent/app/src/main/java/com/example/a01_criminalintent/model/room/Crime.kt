@@ -1,5 +1,6 @@
 package com.example.a01_criminalintent.model.room
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Date
@@ -10,5 +11,7 @@ data class Crime(
     @PrimaryKey val id: UUID = UUID.randomUUID(),
     var title: String = "",
     var date: Date = Date(),
-    var isSolved: Boolean = false
+    var isSolved: Boolean = false,
+    @ColumnInfo(defaultValue = "")
+    var suspect: String = ""
 )

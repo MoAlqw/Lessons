@@ -21,7 +21,7 @@ class CrimeFragmentViewModel(private val state: SavedStateHandle): ViewModel() {
     private val _currentCrime = MutableLiveData<Crime>()
     val currentCrime: LiveData<Crime> get() = _currentCrime
 
-    private val _isLoading = MutableLiveData<Boolean>(true)
+    private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     init {

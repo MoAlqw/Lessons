@@ -1,6 +1,10 @@
 package com.example.a01_criminalintent.view.fragment
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -11,8 +15,13 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.a01_criminalintent.R
 import com.example.a01_criminalintent.databinding.FragmentCrimeBinding
 import com.example.a01_criminalintent.view.fragment.dialog.DatePickerFragment
 import com.example.a01_criminalintent.view.fragment.dialog.TimePickerFragment
@@ -33,9 +42,13 @@ class CrimeFragment: Fragment() {
     private lateinit var dateButton: Button
     private lateinit var timeButton: Button
     private lateinit var solvedCheckBox: CheckBox
+    private lateinit var suspectButton: Button
+    private lateinit var sendReportButton: Button
     private val viewModel: CrimeFragmentViewModel by viewModels {
         CrimeFragmentViewModel.Factory
     }
+    private lateinit var requestPermission: ActivityResultLauncher<String>
+    private lateinit var pickContact: ActivityResultLauncher<Void?>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,12 +62,26 @@ class CrimeFragment: Fragment() {
         dateButton = binding.crimeDate
         solvedCheckBox = binding.crimeSolved
         timeButton = binding.crimeTime
+        suspectButton = binding.btnChooseSuspect
+        sendReportButton = binding.btnSendReport
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        pickContact = registerForActivityResult(ActivityResultContracts.PickContact()) { result: Uri? ->
+            result?.let { getContactName(it) }
+        }
+
+        requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                pickContact.launch(null)
+            } else {
+                Toast.makeText(requireContext(), "Permission was decline", Toast.LENGTH_LONG).show()
+            }
+        }
 
         viewModel.currentCrime.observe(viewLifecycleOwner) {
             if (it.title != titleField.text.toString()) titleField.setText(it.title)
@@ -128,6 +155,14 @@ class CrimeFragment: Fragment() {
                 }
             }
         }
+
+        suspectButton.setOnClickListener {
+            checkPermissionContacts()
+        }
+
+        sendReportButton.setOnClickListener {
+            createIntent()
+        }
     }
 
     override fun onStop() {
@@ -138,6 +173,54 @@ class CrimeFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun getCrimeReport(): String {
+        val crime = viewModel.currentCrime.value ?: throw IllegalStateException("Crime is not load")
+        val solvedString = if (crime.isSolved) {
+            getString(R.string.crime_report_solved)
+        } else {
+            getString(R.string.crime_report_unsolved)
+        }
+        val dateString = SimpleDateFormat("EEE, MMM, dd", Locale.getDefault()).format(crime.date)
+        val suspect = if (crime.suspect.isBlank()) {
+            getString(R.string.crime_report_no_suspect)
+        } else {
+            getString(R.string.crime_report_suspect, crime.suspect)
+        }
+        return getString(
+            R.string.crime_report,
+            crime.title, dateString, solvedString, suspect)
+    }
+
+    private fun getContactName(contactUri: Uri) {
+        val projection = arrayOf(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
+        requireContext().contentResolver.query(contactUri, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val nameIndex = cursor.getColumnIndex(projection[0])
+                val contactName = cursor.getString(nameIndex)
+                viewModel.updateCrime { it.copy(suspect = contactName) }
+            }
+        }
+    }
+
+    private fun createIntent() {
+        val sms = getCrimeReport()
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, sms)
+        }
+        if (intent.resolveActivity(requireContext().packageManager) != null) {
+            startActivity(intent)
+        }
+    }
+
+    private fun checkPermissionContacts() {
+        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            pickContact.launch(null)
+        } else  {
+            requestPermission.launch(android.Manifest.permission.READ_CONTACTS)
+        }
     }
 
     companion object {

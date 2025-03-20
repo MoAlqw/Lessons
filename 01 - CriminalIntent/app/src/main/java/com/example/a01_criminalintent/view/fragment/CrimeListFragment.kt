@@ -10,6 +10,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
 import androidx.core.view.MenuProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +25,8 @@ import java.util.UUID
 class CrimeListFragment : Fragment() {
     private var callbacks: Callbacks? = null
     private lateinit var crimeRecyclerView: RecyclerView
+    private lateinit var contentEmpty: LinearLayout
+    private lateinit var btnAddCrime: Button
     private var _binding: FragmentCrimeListBinding? = null
     private val binding get() = _binding!!
     private val viewModel: CrimeListViewModel by viewModels()
@@ -47,6 +51,12 @@ class CrimeListFragment : Fragment() {
     ): View {
         _binding = FragmentCrimeListBinding.inflate(inflater, container, false)
         crimeRecyclerView = binding.rvCrimeList
+        contentEmpty = binding.linearContentEmpty
+        btnAddCrime = binding.btnAddCrime
+        btnAddCrime.setOnClickListener {
+            createCrime()
+        }
+
         adapter = AdapterCrimeList(callbacks)
         crimeRecyclerView.layoutManager = LinearLayoutManager(context)
         crimeRecyclerView.adapter = adapter
@@ -56,6 +66,11 @@ class CrimeListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.data.observe(viewLifecycleOwner) {
+            if (it.isNotEmpty()) {
+                contentEmpty.visibility = View.GONE
+                btnAddCrime.setOnClickListener(null)
+                crimeRecyclerView.visibility = View.VISIBLE
+            }
             adapter?.submitList(it)
         }
         requireActivity().addMenuProvider(object : MenuProvider {
@@ -65,10 +80,7 @@ class CrimeListFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when(menuItem.itemId) {
                     R.id.new_crime -> {
-                        val newCrime = Crime()
-                        viewModel.addCrimeAndSelect(newCrime) {
-                            callbacks?.onCrimeSelected(newCrime.id)
-                        }
+                        createCrime()
                         true
                     }
                     else -> false
@@ -85,6 +97,13 @@ class CrimeListFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         callbacks = null
+    }
+
+    fun createCrime() {
+        val crime = Crime()
+        viewModel.addCrimeAndSelect(crime) {
+            callbacks?.onCrimeSelected(crime.id)
+        }
     }
 
     companion object {
