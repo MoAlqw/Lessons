@@ -5,11 +5,14 @@ import androidx.room.Room
 import com.example.a01_criminalintent.model.room.Crime
 import com.example.a01_criminalintent.model.room.CrimeDatabase
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 import java.util.UUID
 
 private const val DATABASE_NAME = "crime-database"
 
 class CrimeRepository private constructor(context: Context){
+
+    private val filesDir = context.applicationContext.filesDir
 
     private val database: CrimeDatabase = Room.databaseBuilder(
         context.applicationContext,
@@ -26,6 +29,8 @@ class CrimeRepository private constructor(context: Context){
     suspend fun addCrime(crime: Crime) = crimeDao.addCrime(crime)
 
     suspend fun updateCrime(crime: Crime) = crimeDao.updateCrime(crime)
+
+    fun getPhotoCrime(crime: Crime): File = File(filesDir, crime.photoFileName)
 
     companion object {
         private var INSTANCE: CrimeRepository? = null

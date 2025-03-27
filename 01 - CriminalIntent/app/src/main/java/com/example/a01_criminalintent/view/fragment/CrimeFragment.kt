@@ -13,17 +13,21 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.LinearLayout
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.a01_criminalintent.R
 import com.example.a01_criminalintent.databinding.FragmentCrimeBinding
 import com.example.a01_criminalintent.view.fragment.dialog.DatePickerFragment
+import com.example.a01_criminalintent.view.fragment.dialog.ImageShowFragment
 import com.example.a01_criminalintent.view.fragment.dialog.TimePickerFragment
 import com.example.a01_criminalintent.viewmodel.CrimeFragmentViewModel
 import java.text.SimpleDateFormat
@@ -36,19 +40,23 @@ class CrimeFragment: Fragment() {
 
     private var _binding: FragmentCrimeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var crimeContainer: LinearLayout
+    private lateinit var crimeContainer: ConstraintLayout
     private lateinit var progressBar: ProgressBar
+    private lateinit var imgCrime: ImageView
+    private lateinit var btnSetImage: ImageButton
     private lateinit var titleField: EditText
     private lateinit var dateButton: Button
     private lateinit var timeButton: Button
     private lateinit var solvedCheckBox: CheckBox
     private lateinit var suspectButton: Button
     private lateinit var sendReportButton: Button
+    private lateinit var photoUri: Uri
     private val viewModel: CrimeFragmentViewModel by viewModels {
         CrimeFragmentViewModel.Factory
     }
     private lateinit var requestPermission: ActivityResultLauncher<String>
     private lateinit var pickContact: ActivityResultLauncher<Void?>
+    private lateinit var takePhoto: ActivityResultLauncher<Uri>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,6 +72,8 @@ class CrimeFragment: Fragment() {
         timeButton = binding.crimeTime
         suspectButton = binding.btnChooseSuspect
         sendReportButton = binding.btnSendReport
+        imgCrime = binding.imgCrime
+        btnSetImage = binding.btnSetImage
 
         return binding.root
     }
@@ -72,24 +82,41 @@ class CrimeFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pickContact = registerForActivityResult(ActivityResultContracts.PickContact()) { result: Uri? ->
-            result?.let { getContactName(it) }
+            if (result != null) {
+                getContactName(result)
+            }
+        }
+
+        takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { result ->
+            if (result) {
+                imgCrime.setImageURI(null)
+                imgCrime.setImageURI(photoUri)
+            }
         }
 
         requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
             if (isGranted) {
                 pickContact.launch(null)
             } else {
-                Toast.makeText(requireContext(), "Permission was decline", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Permission was decline", Toast.LENGTH_SHORT).show()
             }
         }
 
         viewModel.currentCrime.observe(viewLifecycleOwner) {
             if (it.title != titleField.text.toString()) titleField.setText(it.title)
-            dateButton.text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(it.date)
+            dateButton.text =
+                SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(it.date)
             timeButton.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(it.date)
             solvedCheckBox.apply {
                 isChecked = it.isSolved
                 jumpDrawablesToCurrentState()
+            }
+        }
+
+        viewModel.photoFile.observe(viewLifecycleOwner) {
+            if (it != null) {
+                photoUri = FileProvider.getUriForFile(requireContext(), "com.example.a01_criminalintent.fileprovider", it)
+                imgCrime.setImageURI(photoUri)
             }
         }
 
@@ -163,6 +190,15 @@ class CrimeFragment: Fragment() {
         sendReportButton.setOnClickListener {
             createIntent()
         }
+
+        btnSetImage.setOnClickListener{
+            takePhoto.launch(photoUri)
+        }
+
+        imgCrime.setOnClickListener {
+            val dialog = ImageShowFragment.newInstance(photoUri)
+            dialog.showNow(parentFragmentManager, null)
+        }
     }
 
     override fun onStop() {
@@ -174,6 +210,8 @@ class CrimeFragment: Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
 
     private fun getCrimeReport(): String {
         val crime = viewModel.currentCrime.value ?: throw IllegalStateException("Crime is not load")
@@ -209,10 +247,9 @@ class CrimeFragment: Fragment() {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, sms)
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
         }
-        if (intent.resolveActivity(requireContext().packageManager) != null) {
-            startActivity(intent)
-        }
+        startActivity(Intent.createChooser(intent, getString(R.string.send_report)))
     }
 
     private fun checkPermissionContacts() {

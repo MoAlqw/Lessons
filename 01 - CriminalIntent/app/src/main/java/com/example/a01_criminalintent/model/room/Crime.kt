@@ -14,4 +14,6 @@ data class Crime(
     var isSolved: Boolean = false,
     @ColumnInfo(defaultValue = "")
     var suspect: String = ""
-)
+) {
+    val photoFileName get() = "IMG_$id.jpg"
+}
