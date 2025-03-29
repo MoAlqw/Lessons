@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CriminalIntent</string>
+    <string name="crime_title_hint">Введите название преступления</string>
+    <string name="crime_title_label">Название</string>
+    <string name="crime_details_label">Детали</string>
+    <string name="crime_solved_label">Раскрыто</string>
+    <string name="crime_title">Название Преступления</string>
+    <string name="crime_date">Дата Преступления</string>
+    <string name="police">Полиция!</string>
+    <string name="new_crime">Новое преступление</string>
+    <string name="crimes">Преступления\n</string>
+    <string name="list_of_crimes_is_empty">Список преступлений пуст..</string>
+    <string name="choose_suspect">Выберите подозреваемого</string>
+    <string name="crime_report">%1$s!
+        Преступление было составлено %2$s. %3$s, и %4$s
+    </string>
+    <string name="send_crime_report">Отправить отчет по Преступлению</string>
+    <string name="crime_report_solved">Дело раскрыто</string>
+    <string name="crime_report_unsolved">Дело не раскрыто</string>
+    <string name="crime_report_no_suspect">тут нет подозреваемого.</string>
+    <string name="crime_report_suspect">подозреваемый - %s.</string>
+    <string name="crime_report_subject">CriminalIntent Отчет Преступления</string>
+    <string name="send_report">Отправить сообщение о преступлении через</string>
+    <string name="image_of_crime">картинка преступления</string>
+    <string name="button_for_set_image_of_crime">кнопка для установки изображения преступления</string>
+    <string name="back_to_crime">вернуться к преступлению</string>
+</resources>

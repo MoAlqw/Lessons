@@ -198,6 +198,13 @@ class CrimeFragment: Fragment() {
         imgCrime.setOnClickListener {
             val dialog = ImageShowFragment.newInstance(photoUri)
             dialog.showNow(parentFragmentManager, null)
+        // the second option, when changing the configuration, renders faster
+        // but overall slower and with ActionBar
+//            val fragment = ImageFragment.newInstance(photoUri)
+//            parentFragmentManager.commit {
+//                replace(R.id.fragment_container, fragment)
+//                addToBackStack(null)
+//            }
         }
     }
 
