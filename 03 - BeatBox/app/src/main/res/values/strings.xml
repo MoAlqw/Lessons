@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Beat Box</string>
+    <string name="button_for_listen_sound">button for listen sound</string>
+    <string name="buttons_for_listen_sounds">Buttons for listen sounds</string>
+</resources>
