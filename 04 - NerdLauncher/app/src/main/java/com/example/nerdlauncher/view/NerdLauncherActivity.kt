@@ -37,6 +37,7 @@ class NerdLauncherActivity : AppCompatActivity() {
     private fun createAndStartIntent(appInfo: AppInfo) {
         val intent = Intent(Intent.ACTION_MAIN).apply {
             setClassName(appInfo.activityInfo.packageName, appInfo.activityInfo.name)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(intent)
     }
