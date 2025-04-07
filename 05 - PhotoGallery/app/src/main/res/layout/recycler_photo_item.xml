@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="5dp"
+    android:padding="5dp">
 
-    <TextView
-        android:id="@+id/tv_photo_info"
+    <ImageView
+        android:id="@+id/img_cat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:contentDescription="@string/image_of_cat"
+        tools:layout_height="40dp"/>
+
+    <TextView
+        android:id="@+id/tv_fact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
         tools:text="Something" />
 
-</FrameLayout>
+</LinearLayout>

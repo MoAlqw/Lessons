@@ -13,8 +13,8 @@ class GalleryFragmentViewModel(
     private val catRepository: CatFactRepository
 ): ViewModel() {
 
-    private val _factCat = MutableLiveData<DataState<Fact>>()
-    val factCat: LiveData<DataState<Fact>> get() = _factCat
+    private val _factCat = MutableLiveData<DataState<List<Fact>>>()
+    val factCat: LiveData<DataState<List<Fact>>> get() = _factCat
 
     init {
         viewModelScope.launch {

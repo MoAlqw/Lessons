@@ -20,13 +20,16 @@ class CatFactRepository {
         catFactApi = retrofit.create(CatFactApi::class.java)
     }
 
-    suspend fun getCatFact(): DataState<Fact> {
+    suspend fun getCatFact(): DataState<List<Fact>> {
         return try {
             val response = catFactApi.getFact()
             val fact = response.body()
             if (response.isSuccessful && fact != null) {
-                fact.code = 200
-                DataState.Success(fact)
+                val data = fact.data
+                if (data[0].code == null) {
+                    data.forEach { it.code = response.code() }
+                }
+                DataState.Success(data)
             } else {
                 DataState.Error(message = response.message(), code = response.code())
             }

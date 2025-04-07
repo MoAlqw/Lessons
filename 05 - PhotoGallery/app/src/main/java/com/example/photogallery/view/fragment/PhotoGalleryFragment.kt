@@ -1,16 +1,17 @@
 package com.example.photogallery.view.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.bumptech.glide.Glide
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.photogallery.databinding.FragmentPhotoGalleryBinding
 import com.example.photogallery.model.DataState
-import com.example.photogallery.model.Fact
 import com.example.photogallery.model.repository.CatFactRepository
+import com.example.photogallery.view.adapter.RecyclerCatAdapter
 import com.example.photogallery.viewmodel.CatFactViewModelFactory
 import com.example.photogallery.viewmodel.GalleryFragmentViewModel
 
@@ -35,36 +36,25 @@ class PhotoGalleryFragment : Fragment() {
         viewModel.factCat.observe(viewLifecycleOwner) { fact ->
             when(fact) {
                 is DataState.Loading -> { }
-                is DataState.Success -> successResponse(fact)
-                is DataState.Error -> errorResponse(fact)
+                is DataState.Success -> {
+                    binding.rvCats.adapter = RecyclerCatAdapter(fact)
+                    binding.rvCats.layoutManager = GridLayoutManager(requireContext(), 2)
+                    updateUI()
+                }
+                is DataState.Error -> { }
 
             }
         }
     }
 
-    private fun updateUI(fact: String, imageUrl: String) {
+    private fun updateUI() {
         with(binding) {
-            tvFactAboutCat.text = fact
-            Glide.with(requireContext())
-                .load(imageUrl)
-                .into(imgCat)
-
             progressBar.visibility = View.GONE
-            containerFact.visibility = View.VISIBLE
+            rvCats.visibility = View.VISIBLE
         }
     }
 
-    private fun successResponse(fact: DataState.Success<Fact>) {
-        val factText = fact.data.fact
-        val imageUrl = "https://http.cat/200"
-        updateUI(factText, imageUrl)
-    }
 
-    private fun errorResponse(error: DataState.Error<Fact>) {
-        val errorMessage = error.message
-        val imageUrl = "https://http.cat/${error.code}"
-        updateUI(errorMessage, imageUrl)
-    }
 
     companion object {
 

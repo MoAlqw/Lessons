@@ -11,32 +11,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
-    <LinearLayout
-        android:id="@+id/container_fact"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_cats"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <ImageView
-            android:id="@+id/img_cat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="10dp"
-            android:contentDescription="@string/image_of_cat" />
-
-        <TextView
-            android:id="@+id/tv_fact_about_cat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            tools:text="Cat is funny" />
-
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:listitem="@layout/recycler_photo_item" />
 
 </FrameLayout>
