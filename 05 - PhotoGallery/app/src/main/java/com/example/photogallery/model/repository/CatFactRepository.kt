@@ -24,12 +24,10 @@ class CatFactRepository {
         return try {
             val response = catFactApi.getFact()
             val fact = response.body()
+
             if (response.isSuccessful && fact != null) {
                 val data = fact.data
-                if (data[0].code == null) {
-                    data.forEach { it.code = response.code() }
-                }
-                DataState.Success(data)
+                DataState.Success(data, response.code())
             } else {
                 DataState.Error(message = response.message(), code = response.code())
             }

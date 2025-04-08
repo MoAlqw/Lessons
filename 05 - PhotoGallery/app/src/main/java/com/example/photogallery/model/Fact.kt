@@ -1,3 +1,5 @@
 package com.example.photogallery.model
 
-data class Fact(val fact: String, val length: Int, var code: Int? = 200)
+import com.google.gson.annotations.SerializedName
+
+data class Fact(@SerializedName("fact") val fact: String)

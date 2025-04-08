@@ -20,7 +20,5 @@ class PhotoGalleryActivity : AppCompatActivity() {
                 add(binding.fragmentContainer.id, PhotoGalleryFragment.newInstance())
             }
         }
-
     }
-
 }

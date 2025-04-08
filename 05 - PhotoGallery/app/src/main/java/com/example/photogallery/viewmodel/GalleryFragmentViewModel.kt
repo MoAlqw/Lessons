@@ -17,6 +17,10 @@ class GalleryFragmentViewModel(
     val factCat: LiveData<DataState<List<Fact>>> get() = _factCat
 
     init {
+        tryToLoadFacts()
+    }
+
+    fun tryToLoadFacts() {
         viewModelScope.launch {
             _factCat.value = DataState.Loading
             val tryResponse = catRepository.getCatFact()
