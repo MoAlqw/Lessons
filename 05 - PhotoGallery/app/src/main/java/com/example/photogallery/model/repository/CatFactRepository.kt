@@ -1,9 +1,12 @@
 package com.example.photogallery.model.repository
 
-import com.example.photogallery.model.DataState
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.photogallery.model.Fact
 import com.example.photogallery.model.api.CatFactApi
-import retrofit2.HttpException
+import com.example.photogallery.model.repository.pager.CatFactsPagerSource
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -20,22 +23,11 @@ class CatFactRepository {
         catFactApi = retrofit.create(CatFactApi::class.java)
     }
 
-    suspend fun getCatFact(): DataState<List<Fact>> {
-        return try {
-            val response = catFactApi.getFact()
-            val fact = response.body()
-
-            if (response.isSuccessful && fact != null) {
-                val data = fact.data
-                DataState.Success(data, response.code())
-            } else {
-                DataState.Error(message = response.message(), code = response.code())
-            }
-        } catch (e: HttpException) {
-            DataState.Error(message = "Something went wrong", code = e.code())
-        } catch (e: Exception) {
-            DataState.Error(message = "Error")
-        }
+    fun getCatFactsPage(): Flow<PagingData<Fact>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10),
+            pagingSourceFactory = { CatFactsPagerSource(catFactApi) }
+        ).flow
     }
 
 }

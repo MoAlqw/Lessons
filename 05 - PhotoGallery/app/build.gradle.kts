@@ -41,11 +41,16 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.paging.runtime)
+
     implementation(libs.glide)
+
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

@@ -5,47 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".view.fragment.PhotoGalleryFragment">
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_cats"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
         tools:listitem="@layout/recycler_fact_item" />
-
-    <LinearLayout
-        android:id="@+id/container_error_load"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
-
-        <ImageView
-            android:id="@+id/img_response"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/image_of_cat" />
-
-        <TextView
-            android:id="@+id/tv_error"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/failed_to_load"
-            android:textColor="@color/red"
-            android:textStyle="bold"/>
-
-        <Button
-            android:id="@+id/btn_retry_load"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/try_again" />
-
-    </LinearLayout>
 
 </FrameLayout>
