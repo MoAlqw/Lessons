@@ -19,6 +19,7 @@ class RecyclerCatAdapter: PagingDataAdapter<Fact, RecyclerCatAdapter.CatFactView
         fun bind(item: Fact, url: String = "https://http.cat/", code: Int = 200) {
             textView.text = item.fact
             glide.load(url + code)
+                .override(750, 600)
                 .into(imageView)
         }
     }

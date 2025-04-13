@@ -21,7 +21,7 @@ class GalleryFragmentViewModel(
         tryToLoadFacts()
     }
 
-    fun tryToLoadFacts() {
+    private fun tryToLoadFacts() {
         viewModelScope.launch {
             catRepository.getCatFactsPage()
                 .cachedIn(viewModelScope)
