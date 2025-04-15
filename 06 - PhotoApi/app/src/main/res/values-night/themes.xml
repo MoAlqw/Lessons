@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PhotoApi" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="toolbarStyle">@style/CustomToolBar.Night</item>
+    </style>
+
+    <style name="CustomToolBar.Night">
+        <item name="titleTextAppearance">@style/ToolbarTitleText.Night</item>
+    </style>
+
+    <style name="ToolbarTitleText.Night">
+        <item name="android:textColor">@color/black</item>
+    </style>
+    
+</resources>
