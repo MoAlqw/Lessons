@@ -1,10 +1,14 @@
 package com.example.photoapi.view.fragment
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -15,6 +19,7 @@ import com.example.photoapi.model.DataState
 import com.example.photoapi.model.repository.UnsplashRepository
 import com.example.photoapi.view.adapter.PhotoAdapter
 import com.example.photoapi.viewmodel.PhotoViewModelFactory
+import com.example.photoapi.worker.PollWorker
 
 class PhotosFragment : Fragment() {
 
@@ -22,8 +27,17 @@ class PhotosFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var adapter: PhotoAdapter
 
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) PollWorker.enqueue(requireContext())
+        }
+
     private val viewModel: PhotoViewModel by viewModels {
         PhotoViewModelFactory(UnsplashRepository())
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -39,6 +53,17 @@ class PhotosFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                PollWorker.enqueue(requireContext())
+            }
+        }
 
         val searchView = binding.openSearchViewToolbar.menu.findItem(R.id.menu_item_search).actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {

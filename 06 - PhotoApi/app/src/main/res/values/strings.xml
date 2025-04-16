@@ -5,4 +5,7 @@
     <string name="search">Search</string>
     <string name="clear_search">Clear Search</string>
     <string name="something_went_wrong">Something went wrong..</string>
+    <string name="notification_channel_name">UnsplashApi</string>
+    <string name="new_pictures_title">New PhotoApi Pictures</string>
+    <string name="new_pictures_text">You have new pictures in PhotoApi.</string>
 </resources>
