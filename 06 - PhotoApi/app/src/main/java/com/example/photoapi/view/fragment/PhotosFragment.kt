@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -19,7 +21,6 @@ import com.example.photoapi.model.DataState
 import com.example.photoapi.model.repository.UnsplashRepository
 import com.example.photoapi.view.adapter.PhotoAdapter
 import com.example.photoapi.viewmodel.PhotoViewModelFactory
-import com.example.photoapi.worker.PollWorker
 
 class PhotosFragment : Fragment() {
 
@@ -28,12 +29,12 @@ class PhotosFragment : Fragment() {
     private lateinit var adapter: PhotoAdapter
 
     private val requestNotificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) PollWorker.enqueue(requireContext())
-        }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     private val viewModel: PhotoViewModel by viewModels {
-        PhotoViewModelFactory(UnsplashRepository())
+        PhotoViewModelFactory(UnsplashRepository(),
+            requireActivity().application
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,29 +47,46 @@ class PhotosFragment : Fragment() {
     ): View {
         _binding = FragmentPhotosBinding.inflate(inflater, container, false)
         adapter = PhotoAdapter()
-        binding.listViewPhoto.adapter = adapter
-        binding.listViewPhoto.layoutManager = GridLayoutManager(requireContext(), 2)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                PollWorker.enqueue(requireContext())
+        ViewCompat.setOnApplyWindowInsetsListener(binding.openSearchViewToolbar) { toolbar, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            toolbar.setPadding(
+                toolbar.paddingLeft,
+                statusBarHeight,
+                toolbar.paddingRight,
+                toolbar.paddingBottom
+            )
+            insets
+        }
+
+        binding.recyclerViewPhoto.adapter = adapter
+        binding.recyclerViewPhoto.layoutManager = GridLayoutManager(requireContext(), 2)
+
+        checkPermission()
+
+        viewModel.menuItemTitle.observe(viewLifecycleOwner) {
+            binding.openSearchViewToolbar.menu.findItem(R.id.menu_item_toggle_polling).setTitle(it)
+        }
+
+        binding.openSearchViewToolbar.setOnMenuItemClickListener {
+            when(it.itemId) {
+                R.id.menu_item_toggle_polling -> {
+                    viewModel.itemPolling()
+                    true
+                }
+                else -> false
             }
         }
 
         val searchView = binding.openSearchViewToolbar.menu.findItem(R.id.menu_item_search).actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null && query != "") viewModel.getPhotos(query)
+                if (!query.isNullOrBlank()) viewModel.getPhotos(query)
                 return true
             }
 
@@ -81,22 +99,29 @@ class PhotosFragment : Fragment() {
             when(result) {
                 is DataState.Success -> {
                     adapter.submitList(result.data.result)
-                    binding.listViewPhoto.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
-                    binding.textViewError.visibility = View.GONE
+                    showOnly(binding.recyclerViewPhoto)
                 }
-                is DataState.Error -> {
-                    binding.listViewPhoto.visibility = View.GONE
-                    binding.progressBar.visibility = View.GONE
-                    binding.textViewError.visibility = View.VISIBLE
-                }
-                is DataState.Loading -> {
-                    binding.listViewPhoto.visibility = View.GONE
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.textViewError.visibility = View.GONE
-                }
+                is DataState.Error -> showOnly(binding.textViewError)
+                is DataState.Loading -> showOnly(binding.progressBar)
             }
         }
+    }
+
+    private fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private fun showOnly(view: View) {
+        binding.recyclerViewPhoto.visibility = if (view == binding.recyclerViewPhoto) View.VISIBLE else View.GONE
+        binding.progressBar.visibility = if (view == binding.progressBar) View.VISIBLE else View.GONE
+        binding.textViewError.visibility = if (view == binding.textViewError) View.VISIBLE else View.GONE
     }
 
     override fun onDestroyView() {

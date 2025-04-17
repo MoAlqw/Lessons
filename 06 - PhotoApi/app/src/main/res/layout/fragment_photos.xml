@@ -9,7 +9,6 @@
         android:id="@+id/open_search_view_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
         app:menu="@menu/fragment_menu_search"
         app:title="@string/app_name"
         app:layout_constraintTop_toTopOf="parent"
@@ -17,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list_view_photo"
+        android:id="@+id/recycler_view_photo"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:contentDescription="@string/set_of_photo"

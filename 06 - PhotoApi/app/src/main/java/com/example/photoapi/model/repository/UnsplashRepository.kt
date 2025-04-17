@@ -29,7 +29,7 @@ class UnsplashRepository {
     suspend fun getPhotos(message: String): DataState<UnsplashSearchResponse> {
         try {
             val response = unsplashApi.searchPhotos(message)
-            if (response.isSuccessful && response.body() != null) {
+            if (response.isSuccessful && response.body() != null && response.body()?.result?.isNotEmpty() == true) {
                 return DataState.Success(response.body()!!)
             }
             return DataState.Error(response.message())
