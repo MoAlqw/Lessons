@@ -1,12 +1,12 @@
 package com.example.photoapi.worker
 
 import android.Manifest
+import android.app.Activity
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.RequiresPermission
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -16,11 +16,11 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.photoapi.PhotoApiApplication
 import com.example.photoapi.R
-import com.example.photoapi.receiver.NotificationReceiver
 import com.example.photoapi.view.activity.MainActivity
 import java.util.concurrent.TimeUnit
 
-class PollWorker(val context: Context, val workerParams: WorkerParameters): Worker(context, workerParams) {
+class PollWorker(val context: Context, workerParams: WorkerParameters):
+    Worker(context, workerParams) {
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun doWork(): Result {
@@ -39,21 +39,30 @@ class PollWorker(val context: Context, val workerParams: WorkerParameters): Work
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
-        val notificationManager = NotificationManagerCompat.from(context)
-        notificationManager.notify(0, notification)
 
-        val intentBroadcast = Intent(context, NotificationReceiver::class.java).apply {
-            action = ACTION_SHOW_NOTIFICATION
-        }
-        context.sendBroadcast(intentBroadcast, PERM_PRIVATE)
+        showBackgroundNotification(Activity.RESULT_OK, notification)
 
         return Result.success()
     }
 
+    private fun showBackgroundNotification(
+        requestCode: Int,
+        notification: Notification
+    ) {
+        val intent = Intent(ACTION_SHOW_NOTIFICATION).apply {
+            `package` = context.packageName
+            putExtra(REQUEST_CODE, requestCode)
+            putExtra(NOTIFICATION, notification)
+        }
+        context.sendOrderedBroadcast(intent, PERM_PRIVATE)
+    }
+
     companion object {
         private const val WORK_NAME = "poll_worker"
-        private const val PERM_PRIVATE = "com.example.photoapi.PRIVATE"
+        const val PERM_PRIVATE = "com.example.photoapi.PRIVATE"
         const val ACTION_SHOW_NOTIFICATION = "com.example.photoapi.worker.SHOW_NOTIFICATION"
+        const val REQUEST_CODE = "request_code"
+        const val NOTIFICATION = "notification"
 
         fun enqueue(context: Context) {
             val constraints = Constraints.Builder()

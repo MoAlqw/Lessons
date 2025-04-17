@@ -11,7 +11,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.photoapi.R
@@ -22,7 +21,7 @@ import com.example.photoapi.model.repository.UnsplashRepository
 import com.example.photoapi.view.adapter.PhotoAdapter
 import com.example.photoapi.viewmodel.PhotoViewModelFactory
 
-class PhotosFragment : Fragment() {
+class PhotosFragment : VisibleFragment() {
 
     private var _binding: FragmentPhotosBinding? = null
     private val binding get() = _binding!!
