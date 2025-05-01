@@ -1,6 +1,7 @@
 package com.example.photoapi.view.fragment
 
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,6 +19,7 @@ import com.example.photoapi.viewmodel.PhotoViewModel
 import com.example.photoapi.databinding.FragmentPhotosBinding
 import com.example.photoapi.model.DataState
 import com.example.photoapi.model.repository.UnsplashRepository
+import com.example.photoapi.view.activity.PhotoPageActivity
 import com.example.photoapi.view.adapter.PhotoAdapter
 import com.example.photoapi.viewmodel.PhotoViewModelFactory
 
@@ -45,7 +47,7 @@ class PhotosFragment : VisibleFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPhotosBinding.inflate(inflater, container, false)
-        adapter = PhotoAdapter()
+        adapter = PhotoAdapter {openPhotoInBrowser(it)}
         return binding.root
     }
 
@@ -104,6 +106,12 @@ class PhotosFragment : VisibleFragment() {
                 is DataState.Loading -> showOnly(binding.progressBar)
             }
         }
+    }
+
+    private fun openPhotoInBrowser(link: Uri) {
+        // val intent = Intent(Intent.ACTION_VIEW, link)
+        val intent = PhotoPageActivity.newIntent(requireContext(), link)
+        startActivity(intent)
     }
 
     private fun checkPermission() {

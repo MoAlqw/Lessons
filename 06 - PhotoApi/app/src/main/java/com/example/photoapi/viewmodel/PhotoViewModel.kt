@@ -42,6 +42,7 @@ class PhotoViewModel(
         _photos.value = DataState.Loading()
         viewModelScope.launch(Dispatchers.IO) {
             val result = repositoryApi.getPhotos(search)
+
             _photos.postValue(result)
         }
     }
